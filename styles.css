@@ -1,0 +1,446 @@
+/* BCE CSV Processor App Styles */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+.app-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+    text-align: center;
+}
+
+.header-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.header-title i {
+    font-size: 2rem;
+}
+
+.header-title h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.header-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* Main Content */
+.app-main {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Cards */
+.upload-card,
+.processing-card,
+.results-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+}
+
+/* Upload Section */
+.upload-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.upload-header h2 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.upload-header p {
+    margin: 0;
+    color: #666;
+    font-size: 1rem;
+}
+
+.file-drop-zone {
+    border: 3px dashed #dee2e6;
+    border-radius: 12px;
+    padding: 60px 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #fafbfc;
+}
+
+.file-drop-zone:hover,
+.file-drop-zone.dragover {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+.drop-zone-content i {
+    font-size: 3rem;
+    color: #667eea;
+    margin-bottom: 20px;
+}
+
+.drop-zone-content h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 1.2rem;
+}
+
+.drop-zone-content p {
+    margin: 0 0 15px 0;
+    color: #666;
+}
+
+.drop-zone-content small {
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.link-button {
+    background: none;
+    border: none;
+    color: #667eea;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: inherit;
+}
+
+.link-button:hover {
+    color: #5a67d8;
+}
+
+/* File Info */
+.file-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.file-details {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.file-icon i {
+    font-size: 2rem;
+    color: #28a745;
+}
+
+.file-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.file-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.file-size,
+.file-type {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.file-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Buttons */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5a67d8;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+/* Processing Section */
+.processing-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.processing-header h2 {
+    margin: 0;
+    color: #333;
+}
+
+.processing-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #667eea;
+    font-weight: 500;
+}
+
+.processing-status i {
+    font-size: 1.2rem;
+}
+
+/* Progress Bar */
+.progress-container {
+    margin-bottom: 30px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: #e9ecef;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 6px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* Processing Stats */
+.processing-stats {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #28a745;
+    margin-bottom: 5px;
+}
+
+.stat-number.error {
+    color: #dc3545;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Results Section */
+.results-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.results-header h2 {
+    margin: 0 0 15px 0;
+    color: #333;
+}
+
+.results-summary {
+    font-size: 1.1rem;
+    color: #666;
+}
+
+.results-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+/* Error Details */
+.error-details {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid #dee2e6;
+}
+
+.error-details h3 {
+    margin: 0 0 20px 0;
+    color: #dc3545;
+}
+
+.error-table-container {
+    overflow-x: auto;
+}
+
+.error-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.error-table th,
+.error-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.error-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #333;
+}
+
+.error-table td {
+    color: #666;
+}
+
+.error-table tr:hover {
+    background: #f8f9fa;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .app-container {
+        padding: 15px;
+    }
+    
+    .header-title {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .header-title h1 {
+        font-size: 1.5rem;
+    }
+    
+    .file-info {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .processing-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .processing-stats {
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .results-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.upload-section,
+.processing-section,
+.results-section {
+    animation: fadeIn 0.5s ease;
+}
+
+/* Status Classes */
+.status-success {
+    color: #28a745;
+}
+
+.status-error {
+    color: #dc3545;
+}
+
+.status-warning {
+    color: #ffc107;
+}

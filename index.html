@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCE CSV Processor</title>
+    <link href="https://unpkg.com/@contentstack/venus-components@1.0.0/build/main.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="./styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-title">
+                    <i class="fas fa-file-csv"></i>
+                    <h1>BCE CSV Processor</h1>
+                </div>
+                <div class="header-subtitle">
+                    Process MDU and Tariff CSV files and create Contentstack entries
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <!-- Upload Section -->
+            <section class="upload-section" id="uploadSection">
+                <div class="upload-card">
+                    <div class="upload-header">
+                        <h2>Upload CSV File</h2>
+                        <p>Support for MDU and Tariff CSV files</p>
+                    </div>
+                    
+                    <div class="file-drop-zone" id="fileDropZone">
+                        <div class="drop-zone-content">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Drag and drop your CSV file here</h3>
+                            <p>or <button class="link-button" id="browseButton">browse for files</button></p>
+                            <small>Supported formats: .csv files only</small>
+                        </div>
+                        <input type="file" id="fileInput" accept=".csv" hidden>
+                    </div>
+                    
+                    <div class="file-info" id="fileInfo" style="display: none;">
+                        <div class="file-details">
+                            <div class="file-icon">
+                                <i class="fas fa-file-csv"></i>
+                            </div>
+                            <div class="file-meta">
+                                <div class="file-name" id="fileName"></div>
+                                <div class="file-size" id="fileSize"></div>
+                                <div class="file-type" id="fileType"></div>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-danger" id="removeFileButton">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                            <button class="btn btn-primary" id="processButton">
+                                <i class="fas fa-play"></i> Process File
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Processing Section -->
+            <section class="processing-section" id="processingSection" style="display: none;">
+                <div class="processing-card">
+                    <div class="processing-header">
+                        <h2>Processing CSV</h2>
+                        <div class="processing-status" id="processingStatus">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span id="statusText">Initializing...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="progressText">0 / 0 processed</span>
+                            <span id="progressPercent">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="processing-stats" id="processingStats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="successCount">0</div>
+                            <div class="stat-label">Successful</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number error" id="errorCount">0</div>
+                            <div class="stat-label">Errors</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="totalCount">0</div>
+                            <div class="stat-label">Total</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-card">
+                    <div class="results-header">
+                        <h2>Processing Complete</h2>
+                        <div class="results-summary" id="resultsSummary"></div>
+                    </div>
+                    
+                    <div class="results-actions">
+                        <button class="btn btn-secondary" id="processAnotherButton">
+                            <i class="fas fa-plus"></i> Process Another File
+                        </button>
+                        <button class="btn btn-primary" id="viewEntriesButton">
+                            <i class="fas fa-external-link-alt"></i> View Created Entries
+                        </button>
+                    </div>
+                    
+                    <!-- Error Details -->
+                    <div class="error-details" id="errorDetails" style="display: none;">
+                        <h3>Processing Errors</h3>
+                        <div class="error-table-container">
+                            <table class="error-table" id="errorTable">
+                                <thead>
+                                    <tr>
+                                        <th>Row</th>
+                                        <th>Error</th>
+                                        <th>Data</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="errorTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@contentstack/app-sdk@1.0.0/dist/index.js"></script>
+    <script src="https://unpkg.com/papaparse@5.3.0/papaparse.min.js"></script>
+    <script src="./csv-processor.js"></script>
+    <script src="./app.js"></script>
+</body>
+</html>
