@@ -4,11 +4,21 @@ class BCECSVProcessorApp {
         this.currentFile = null;
         this.elements = {};
         this.isProcessing = false;
+        this.config = {
+            apiKey: null,
+            managementToken: null,
+            environment: 'development',
+            mduContentType: 'mdu_entries',
+            baseUrl: 'https://api.contentstack.io/v3'
+        };
     }
 
-    initialize() {
+    async initialize() {
         try {
-            console.log('Initializing simplified CSV processor...');
+            console.log('Initializing CSV processor with API integration...');
+            
+            // Try to get config from parent window (Contentstack app context)
+            await this.loadConfig();
             
             // Cache DOM elements
             this.cacheElements();
@@ -16,14 +26,33 @@ class BCECSVProcessorApp {
             // Set up event listeners
             this.setupEventListeners();
             
-            // Show initial upload section
-            this.showSection('upload');
+            // Show initial upload section or config section
+            if (this.config.apiKey && this.config.managementToken) {
+                this.showSection('upload');
+            } else {
+                this.showConfigSection();
+            }
             
             console.log('CSV Processor initialized successfully');
             
         } catch (error) {
             console.error('Failed to initialize app:', error);
             this.showError('Failed to initialize application: ' + error.message);
+        }
+    }
+
+    async loadConfig() {
+        try {
+            // Try to get config from URL parameters or localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            this.config.apiKey = urlParams.get('api_key') || localStorage.getItem('cs_api_key');
+            this.config.managementToken = urlParams.get('management_token') || localStorage.getItem('cs_management_token');
+            this.config.environment = urlParams.get('environment') || localStorage.getItem('cs_environment') || 'development';
+            this.config.mduContentType = urlParams.get('mdu_content_type') || localStorage.getItem('cs_mdu_content_type') || 'mdu_entries';
+            
+        } catch (error) {
+            console.warn('Could not load config:', error);
         }
     }
 
@@ -153,11 +182,8 @@ class BCECSVProcessorApp {
             // Parse CSV file
             const csvData = await this.parseCSVFile(this.currentFile);
             
-            // Show demo processing
-            await this.simulateProcessing(csvData);
-            
-            // Show results
-            this.showResults(csvData.length, 0);
+            // Process with real API calls
+            await this.processWithAPI(csvData);
             
         } catch (error) {
             console.error('Processing error:', error);
@@ -210,27 +236,156 @@ class BCECSVProcessorApp {
         });
     }
 
-    async simulateProcessing(data) {
-        const total = data.length;
-        
+    async processWithAPI(csvData) {
+        if (!this.config.apiKey || !this.config.managementToken) {
+            this.showError('Please configure your Contentstack credentials first.');
+            this.showConfigSection();
+            return;
+        }
+
+        const total = csvData.length;
+        let successCount = 0;
+        let errorCount = 0;
+
+        this.elements.totalCount.textContent = total;
+
         for (let i = 0; i < total; i++) {
+            try {
+                // Parse MDU data from CSV row
+                const mduData = this.parseMDURow(csvData[i], i + 1);
+                
+                // Create entry via API
+                await this.createMDUEntry(mduData);
+                
+                successCount++;
+                this.elements.successCount.textContent = successCount;
+                
+            } catch (error) {
+                console.error(`Error processing row ${i + 1}:`, error);
+                errorCount++;
+                this.elements.errorCount.textContent = errorCount;
+            }
+            
             // Update progress
             const percent = Math.round(((i + 1) / total) * 100);
             this.elements.progressFill.style.width = percent + '%';
             this.elements.progressText.textContent = `${i + 1} / ${total} processed`;
             this.elements.progressPercent.textContent = percent + '%';
-            this.elements.successCount.textContent = i + 1;
-            this.elements.totalCount.textContent = total;
             
-            // Simulate processing time
-            await new Promise(resolve => setTimeout(resolve, 100));
+            // Small delay to avoid rate limits
+            await new Promise(resolve => setTimeout(resolve, 200));
         }
+        
+        this.showResults(successCount, errorCount);
+    }
+
+    parseMDURow(row, rowIndex) {
+        // Validate required fields
+        if (!row[0] || !row[1]) {
+            throw new Error(`Missing required fields (civic number or street name) at row ${rowIndex}`);
+        }
+
+        return {
+            title: `${row[0]} ${row[1]}`,
+            civic_number: row[0]?.toString().trim(),
+            street_name_en: row[1]?.toString().trim(),
+            street_name_fr: row[2]?.toString().trim() || '',
+            street_direction_en: row[3]?.toString().trim() || '',
+            street_direction_fr: row[4]?.toString().trim() || '',
+            additional_info_en: row[5]?.toString().trim() || '',
+            additional_info_fr: row[6]?.toString().trim() || '',
+            expiry_date: row[7]?.toString().trim() || '',
+            is_visible: row[8] === '1',
+            city_id: parseInt(row[9]) || 0,
+            street_id: parseInt(row[10]) || 0,
+            province_id: parseInt(row[11]) || 0,
+            file_type: row[12]?.toString().trim() || '',
+            posting_date: row[13]?.toString().trim() || '',
+            comment: row[14]?.toString().trim() || '',
+            import_timestamp: new Date().toISOString()
+        };
+    }
+
+    async createMDUEntry(mduData) {
+        const response = await fetch(`${this.config.baseUrl}/content_types/${this.config.mduContentType}/entries`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'api_key': this.config.apiKey,
+                'authorization': this.config.managementToken
+            },
+            body: JSON.stringify({
+                entry: mduData
+            })
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`API Error: ${response.status} - ${error}`);
+        }
+
+        return await response.json();
+    }
+
+    showConfigSection() {
+        const configHtml = `
+            <div class="config-section">
+                <div class="config-card">
+                    <h2>Configure Contentstack Connection</h2>
+                    <p>Enter your Contentstack credentials to enable CSV processing:</p>
+                    
+                    <div class="config-form">
+                        <div class="form-group">
+                            <label>Stack API Key:</label>
+                            <input type="text" id="apiKey" placeholder="Your stack API key" />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Management Token:</label>
+                            <input type="password" id="managementToken" placeholder="Your management token" />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Environment:</label>
+                            <input type="text" id="environment" value="development" />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>MDU Content Type UID:</label>
+                            <input type="text" id="mduContentType" value="mdu_entries" />
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="app.saveConfig()">
+                            Save Configuration
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.querySelector('.app-main').innerHTML = configHtml;
+    }
+
+    saveConfig() {
+        this.config.apiKey = document.getElementById('apiKey').value;
+        this.config.managementToken = document.getElementById('managementToken').value;
+        this.config.environment = document.getElementById('environment').value || 'development';
+        this.config.mduContentType = document.getElementById('mduContentType').value || 'mdu_entries';
+        
+        // Save to localStorage
+        localStorage.setItem('cs_api_key', this.config.apiKey);
+        localStorage.setItem('cs_management_token', this.config.managementToken);
+        localStorage.setItem('cs_environment', this.config.environment);
+        localStorage.setItem('cs_mdu_content_type', this.config.mduContentType);
+        
+        // Reload the page to show upload section
+        location.reload();
     }
 
     showResults(successCount, errorCount) {
         this.elements.resultsSummary.innerHTML = `
             <div class="result-item success">
-                <strong>${successCount}</strong> entries processed successfully
+                <strong>${successCount}</strong> entries created successfully
             </div>
             ${errorCount > 0 ? `<div class="result-item error"><strong>${errorCount}</strong> errors occurred</div>` : ''}
         `;
@@ -290,8 +445,12 @@ class BCECSVProcessorApp {
 }
 
 // Initialize app when DOM is loaded
+let app;
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing app...');
-    const app = new BCECSVProcessorApp();
+    app = new BCECSVProcessorApp();
     app.initialize();
+    
+    // Make app globally available for config form
+    window.app = app;
 });
