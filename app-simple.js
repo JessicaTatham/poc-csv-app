@@ -43,7 +43,33 @@ class BCECSVProcessorApp {
 
     async loadConfig() {
         try {
-            // Try to get config from URL parameters or localStorage
+            // First try to load from BCE.ca API endpoint (uses env variables)
+            try {
+                const response = await fetch('https://bce.ca/api/csv-config');
+                if (response.ok) {
+                    const config = await response.json();
+                    this.config.apiKey = config.apiKey;
+                    this.config.managementToken = config.managementToken;
+                    this.config.environment = config.environment || 'development';
+                    this.config.mduContentType = config.mduContentType || 'mdu_entries';
+                    console.log('Loaded config from BCE.ca API');
+                    return;
+                }
+            } catch (apiError) {
+                console.log('Could not load from BCE.ca API, trying other methods...');
+            }
+
+            // Fallback to local config.js file
+            if (window.CONTENTSTACK_CONFIG) {
+                this.config.apiKey = window.CONTENTSTACK_CONFIG.apiKey;
+                this.config.managementToken = window.CONTENTSTACK_CONFIG.managementToken;
+                this.config.environment = window.CONTENTSTACK_CONFIG.environment || 'development';
+                this.config.mduContentType = window.CONTENTSTACK_CONFIG.mduContentType || 'mdu_entries';
+                console.log('Loaded config from local config file');
+                return;
+            }
+
+            // Fallback to URL parameters or localStorage
             const urlParams = new URLSearchParams(window.location.search);
             
             this.config.apiKey = urlParams.get('api_key') || localStorage.getItem('cs_api_key');
